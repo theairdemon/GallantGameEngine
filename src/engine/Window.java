@@ -1,7 +1,5 @@
 package engine;
 
-package org.lwjglb.engine;
-
 import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -54,11 +52,89 @@ public class Window {
             throw new RuntimeException("failed to create GLFW window");
         }
 
-        )
+        // setup resize callback
+        glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
+            this.width = width;
+            this.height = height;
+            this.setResized(true);
+        });
+
+        // setup key callback; will be called everytime a key is pressed, repeated, or released
+        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                glfwSetWindowShouldClose(window, true); // will detect this in rendering loop
+            }
+        });
+
+        // get resolution of primary monitor
+        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        // center window
+        glfwSetWindowPos(
+                windowHandle,
+                (vidmode.width() - width) / 2,
+                (vidmode.height() - height) / 2
+        );
+
+        // make opengl context current
+        glfwMakeContextCurrent(windowHandle);
+
+        if (isvSync()) {
+            glfwSwapInterval(1); // enable vSync
+        }
+
+        // make window visible
+        glfwShowWindow(windowHandle);
+
+        GL.createCapabilities();
+
+        // set clear color
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    }
+
+    public void setClearColor(float r, float g, float b, float alpha) {
+        glClearColor(r, g, b, alpha);
     }
 
     public boolean isKeyPressed(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
+    }
+
+    public boolean windowShouldClose() {
+        return glfwWindowShouldClose(windowHandle);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public boolean isResized() {
+        return resized;
+    }
+
+    public void setResized(boolean resized) {
+        this.resized = resized;
+    }
+
+    public boolean isvSync() {
+        return vSync;
+    }
+
+    public void setvSync(boolean vSync) {
+        this.vSync = vSync;
+    }
+
+    public void update() {
+        glfwSwapBuffers(windowHandle);
+        glfwPollEvents();
     }
 
 }

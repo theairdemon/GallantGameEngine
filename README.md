@@ -1,2 +1,2 @@
 # GallantGameEngine
- LWJGL-based main.game main.engine for Gallant Game Company
+ LWJGL-based game engine for Gallant Game Company

@@ -1,10 +1,9 @@
-package game;
+package main.game;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glViewport;
 
-import engine.IGameLogic;
-import engine.Window;
+import main.engine.IGameLogic;
+import main.engine.Window;
 
 public class DummyGame implements IGameLogic {
 
@@ -45,12 +44,12 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        if (window.isResized()) {
-            glViewport(0,0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
-
         window.setClearColor(color, color, color, 0.0f);
-        renderer.clear();
+        renderer.render(window);
+    }
+
+    @Override
+    public void cleanup() {
+        renderer.cleanup();
     }
 }

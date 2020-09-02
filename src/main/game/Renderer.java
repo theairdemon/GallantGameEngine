@@ -1,46 +1,50 @@
 package main.game;
 
-import org.lwjgl.system.MemoryUtil;
+import org.joml.Matrix4f;
+import static org.lwjgl.opengl.GL11.*;
+
 import main.engine.Utils;
 import main.engine.Window;
+import main.engine.GameItem;
 import main.engine.graph.ShaderProgram;
 import main.engine.graph.Mesh;
-
-import java.nio.FloatBuffer;
-
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import main.engine.graph.Transformation;
 
 public class Renderer {
 
-    private int vboId;
-    private int vaoId;
+    // FOV in radians
+    private static final float FOV = (float) Math.toRadians(60.0f);
+    private static final float Z_NEAR = 0.01f;
+    private static final float Z_FAR = 1000.f;
+
+    private final Transformation transformation;
     private ShaderProgram shaderProgram;
 
     public Renderer() {
-
+        transformation = new Transformation();
     }
 
-    public void init() throws Exception {
+    public void init(Window window) throws Exception {
+        // Create shader
         shaderProgram = new ShaderProgram();
         // have to use relative path from Utils.java to main.resources files
         // up 1 gets you to src, then into main.resources then the filename
         shaderProgram.createVertexShader(Utils.loadResource("../resources/vertex.vs"));
         shaderProgram.createFragmentShader(Utils.loadResource("../resources/fragment.fs"));
         shaderProgram.link();
+
+        // Create uniforms for world and projection matrices
+        shaderProgram.createUniform("projectionMatrix");
+        shaderProgram.createUniform("worldMatrix");
+
+        window.setClearColor(0.0f,0.0f,0.0f,0.0f);
     }
 
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Mesh mesh) {
+    public void render(Window window, GameItem[] gameItems) {
         clear();
 
         if (window.isResized()) {
@@ -50,12 +54,21 @@ public class Renderer {
 
         shaderProgram.bind();
 
-        // Draw the mesh
-        glBindVertexArray(mesh.getVaoId());
-        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+        // Update projection matrix
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
-        // Restore state
-        glBindVertexArray(0);
+        // Render each gameItem
+        for (GameItem gameItem : gameItems) {
+            // Set world matrix for this item
+            Matrix4f worldMatrix = transformation.getWorldMatrix(
+                    gameItem.getPosition(),
+                    gameItem.getRotation(),
+                    gameItem.getScale());
+            shaderProgram.setUniform("worldMatrix", worldMatrix);
+            // Render the mesh for this game item
+            gameItem.getMesh().render();
+        }
 
         shaderProgram.unbind();
     }

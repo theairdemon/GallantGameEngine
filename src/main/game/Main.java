@@ -11,8 +11,8 @@ public class Main {
             IGameLogic gameLogic = new DummyGame();
             GameEngine gameEng = new GameEngine("GAME", 600, 480, vSync, gameLogic);
             gameEng.run();
-        } catch (Exception excp) {
-            excp.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(-1);
         }
     }

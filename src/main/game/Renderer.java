@@ -39,10 +39,10 @@ public class Renderer {
 
     public void init() throws Exception {
         shaderProgram = new ShaderProgram();
-        // have to use relative path from Utils.java to resources files
-        // up 2 gets you to src, then into resources then the filename
-        shaderProgram.createVertexShader(Utils.loadResource("../../resources/vertex.vs"));
-        shaderProgram.createFragmentShader(Utils.loadResource("../../resources/fragment.fs"));
+        // have to use relative path from Utils.java to main.resources files
+        // up 1 gets you to src, then into main.resources then the filename
+        shaderProgram.createVertexShader(Utils.loadResource("../resources/vertex.vs"));
+        shaderProgram.createFragmentShader(Utils.loadResource("../resources/fragment.fs"));
         shaderProgram.link();
 
         float[] vertices = new float[] {

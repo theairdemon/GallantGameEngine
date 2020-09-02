@@ -1,4 +1,4 @@
-package engine.graph;
+package main.engine.graph;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -53,7 +53,7 @@ public class ShaderProgram {
             glDetachShader(programId, fragmentShaderId);
         }
 
-        // TODO: remove validation when game is in production state
+        // TODO: remove validation when main.game is in production state
         glValidateProgram(programId);
         if (glGetProgrami(programId, GL_VALIDATE_STATUS) == 0) {
             System.err.println("Warning validating Shader code: " + glGetProgramInfoLog(programId, 1024));

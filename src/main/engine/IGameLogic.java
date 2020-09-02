@@ -1,4 +1,4 @@
-package engine;
+package main.engine;
 
 public interface IGameLogic {
 
@@ -9,5 +9,7 @@ public interface IGameLogic {
     void update(float interval);
 
     void render(Window window);
+
+    void cleanup();
 
 }

@@ -1,7 +1,7 @@
-package game;
+package main.game;
 
-import engine.GameEngine;
-import engine.IGameLogic;
+import main.engine.GameEngine;
+import main.engine.IGameLogic;
 
 public class Main {
 
